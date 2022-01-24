@@ -25,7 +25,7 @@ class VBO {
      */
     buildDOM() {
         // Delete the element if it already exists
-        if(this.rootElement != null){
+        if(this.rootElement != null && this.rootElement.parentElement != null){
             this.rootElement.parentElement.removeChild(this.rootElement);
         }
         
@@ -55,7 +55,8 @@ class VBO {
      */
     updateDOM() {
         if(this.rootElement != null){
-            this.rootElement.parentElement.appendChild(this.buildDOM());
+            let e = this.rootElement.nextElementSibling;
+            this.rootElement.parentElement.insertBefore(this.buildDOM(), e);
         }
     }
 
@@ -128,7 +129,7 @@ class Vertex {
      */
     buildDOM(){
         // Delete the element if it already exists
-        if(this.rootElement != null){
+        if(this.rootElement != null && this.rootElement.parentElement != null){
             this.rootElement.parentElement.removeChild(this.rootElement);
         }
 
@@ -204,9 +205,33 @@ class Vertex {
     }
 }
 
-let vbo = new VBO("VBO 1");
-let vert = new Vertex(vbo);
-vert.color = "#FF0000"
-vbo.addVertex(vert);
-let vert2 = new Vertex(vbo);
-vbo.addVertex(vert2);
+/** @type {VBO[]} */
+var vbos = [];
+
+function updateVBOs(){
+    let e = document.getElementById("inputs");
+    while(e.firstChild != null) e.removeChild(e.firstChild);
+    console.log(vbos);
+    for(let v of vbos){
+        e.appendChild(v.buildDOM())
+    }
+    let button = document.createElement("button");
+    button.innerText = "Add VBO"
+    button.onclick = () => {
+        vbos.push(new VBO("VBO"));
+        updateVBOs();
+    }
+    e.appendChild(button);
+}
+
+window.onload = () => {
+    let vbo = new VBO("VBO 1");
+    let vert = new Vertex(vbo);
+    vert.color = "#FF0000"
+    vbo.addVertex(vert);
+    let vert2 = new Vertex(vbo);
+    vbo.addVertex(vert2);
+
+    vbos.push(vbo);
+    updateVBOs();
+}
