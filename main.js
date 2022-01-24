@@ -44,6 +44,7 @@ class VBO {
         this.addButton.innerText = "Add Vertex";
         this.addButton.onclick = () => {
             this.addVertex(new Vertex(this));
+            redraw();
         }
         this.rootElement.appendChild(this.addButton);
 
@@ -144,6 +145,7 @@ class Vertex {
             this.xInput.value = this.x;
             this.xInput.onchange = () => {
                 this.x = this.xInput.value;
+                redraw()
             }
             label.appendChild(this.xInput);
             this.rootElement.appendChild(label);
@@ -157,6 +159,7 @@ class Vertex {
             this.yInput.value = this.y;
             this.yInput.onchange = () => {
                 this.y = this.yInput.value;
+                redraw()
             }
             label.appendChild(this.yInput);
             this.rootElement.appendChild(label);
@@ -166,6 +169,7 @@ class Vertex {
         this.colorPicker.value = this.color;
         this.colorPicker.onchange = () => {
             this.color = this.colorPicker.value;
+            redraw()
         }
         this.rootElement.appendChild(this.colorPicker);
 
@@ -179,6 +183,7 @@ class Vertex {
             this.parent.verts.splice(idx-1, 0, this);
             this.parent.updateDOM();
             console.log(this.parent.verts);
+            redraw()
         }
         this.rootElement.appendChild(this.upButton);
         this.downButton = document.createElement("button");
@@ -189,6 +194,7 @@ class Vertex {
             this.parent.verts.splice(idx, 1);
             this.parent.verts.splice(idx+1, 0, this);
             this.parent.updateDOM();
+            redraw()
         }
         this.rootElement.appendChild(this.downButton);
 
@@ -198,6 +204,7 @@ class Vertex {
             let idx = this.parent.verts.indexOf(this);
             this.parent.verts.splice(idx, 1);
             this.parent.updateDOM();
+            redraw()
         }
         this.rootElement.appendChild(this.removeButton);
 
@@ -233,9 +240,13 @@ function redraw(){
     const height = document.getElementById("display").height;
     const cx = width/2;
     const cy = height/2;
-    const scale = width/15;
+    const scale = width/20;
+
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, width, height);
 
     ctx.lineWidth = 1;
+    ctx.strokeStyle = "black";
     ctx.beginPath();
     ctx.moveTo(cx, 0);
     ctx.lineTo(cx, height);
@@ -243,7 +254,16 @@ function redraw(){
     ctx.lineTo(width, cy);
     ctx.stroke();
 
-    ctx.lineWidth = scale;
+    ctx.lineWidth = scale/2;
+    for(let vbo of vbos){
+        ctx.beginPath();
+        ctx.moveTo(vbo.verts[0].x*scale + cx, vbo.verts[0].y*-scale + cy);
+        for(let vert of vbo.verts){
+            ctx.strokeStyle = vert.color;
+            ctx.lineTo(vert.x*scale + cx, vert.y*-scale + cy);
+        }
+        ctx.stroke();
+    }
 }
 
 window.onload = () => {
