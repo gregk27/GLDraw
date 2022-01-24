@@ -10,6 +10,8 @@ class VBO {
         this.name = name;
         /** @type Vertex[] */
         this.verts = [];
+        /** @type number */
+        this.nextId = 0;
 
         /** @type {HTMLElement} */
         this.rootElement = null;
@@ -77,6 +79,14 @@ class VBO {
             return "#000000"
         }
     }
+
+    /**
+     * Get the unique ID of the next vertex
+     * @returns ID of the next vertex
+     */
+    getNextId(){
+        return `${this.name}::V${this.nextId++}`;
+    }
 }
 
 class Vertex {
@@ -93,6 +103,8 @@ class Vertex {
         this.y = 0;
         /** @type {string} */
         this.color = parent.getNextColor();
+        /** @type {string} */
+        this.id = parent.getNextId();
 
         /** @type {HTMLElement} */
         this.rootElement
@@ -127,6 +139,9 @@ class Vertex {
             this.xInput.type = "number";
             this.xInput.size = "3";
             this.xInput.value = this.x;
+            this.xInput.onchange = () => {
+                this.x = this.xInput.value;
+            }
             label.appendChild(this.xInput);
             this.rootElement.appendChild(label);
         }
@@ -137,19 +152,41 @@ class Vertex {
             this.yInput.type = "number";
             this.yInput.size = "3";
             this.yInput.value = this.y;
+            this.yInput.onchange = () => {
+                this.y = this.yInput.value;
+            }
             label.appendChild(this.yInput);
             this.rootElement.appendChild(label);
         }
         this.colorPicker = document.createElement('input');
         this.colorPicker.type = "color";
         this.colorPicker.value = this.color;
+        this.colorPicker.onchange = () => {
+            this.color = this.colorPicker.value;
+        }
         this.rootElement.appendChild(this.colorPicker);
 
         this.upButton = document.createElement("button");
         this.upButton.innerText = "🠝"
+        this.upButton.onclick = () => {
+            let idx = this.parent.verts.indexOf(this);
+            if(idx == 0) return;
+            console.log(this.parent.verts);
+            this.parent.verts.splice(idx, 1);
+            this.parent.verts.splice(idx-1, 0, this);
+            this.parent.updateDOM();
+            console.log(this.parent.verts);
+        }
         this.rootElement.appendChild(this.upButton);
         this.downButton = document.createElement("button");
         this.downButton.innerText = "🠟"
+        this.downButton.onclick = () => {
+            let idx = this.parent.verts.indexOf(this);
+            if(idx == this.parent.verts.length) return;
+            this.parent.verts.splice(idx, 1);
+            this.parent.verts.splice(idx+1, 0, this);
+            this.parent.updateDOM();
+        }
         this.rootElement.appendChild(this.downButton);
 
         return this.rootElement;
