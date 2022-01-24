@@ -5,6 +5,9 @@ body {
     grid-template-areas: "heading heading" "inputs display";
     grid-template-columns: min-content auto;
     grid-template-rows: auto auto;
+    column-gap: 2em;
+    margin-right: 2em;
+    margin-bottom: 2em;
 }
 
 body>h1 {
@@ -54,4 +57,5 @@ input[type=color] {
 
 #display {
     grid-area: display;
+    border:1px solid black;
 }

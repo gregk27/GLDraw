@@ -224,6 +224,28 @@ function updateVBOs(){
     e.appendChild(button);
 }
 
+function redraw(){
+    const canvas = document.getElementById("display");
+    /** @type {CanvasRenderingContext2D} */
+    const ctx = canvas.getContext('2d');
+
+    const width = document.getElementById("display").width;
+    const height = document.getElementById("display").height;
+    const cx = width/2;
+    const cy = height/2;
+    const scale = width/15;
+
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx, 0);
+    ctx.lineTo(cx, height);
+    ctx.moveTo(0, cy);
+    ctx.lineTo(width, cy);
+    ctx.stroke();
+
+    ctx.lineWidth = scale;
+}
+
 window.onload = () => {
     let vbo = new VBO("VBO 1");
     let vert = new Vertex(vbo);
@@ -234,4 +256,6 @@ window.onload = () => {
 
     vbos.push(vbo);
     updateVBOs();
+
+    redraw()
 }
