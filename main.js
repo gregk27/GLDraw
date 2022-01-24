@@ -118,6 +118,8 @@ class Vertex {
         this.upButton = null;
         /** @type {HTMLButtonElement} */
         this.downButton = null;
+        /** @type {HTMLButtonElement} */
+        this.removeButton = null;
     }
 
     /**
@@ -188,6 +190,15 @@ class Vertex {
             this.parent.updateDOM();
         }
         this.rootElement.appendChild(this.downButton);
+
+        this.removeButton = document.createElement("button");
+        this.removeButton.innerText = "×"
+        this.removeButton.onclick = () => {
+            let idx = this.parent.verts.indexOf(this);
+            this.parent.verts.splice(idx, 1);
+            this.parent.updateDOM();
+        }
+        this.rootElement.appendChild(this.removeButton);
 
         return this.rootElement;
     }

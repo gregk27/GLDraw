@@ -45,6 +45,7 @@ input[type=color] {
 
 .vertex>button {
     font-weight: bold;
+    height: 2em;
 }
 
 .vbo>button, #inputs>button {
