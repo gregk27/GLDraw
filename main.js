@@ -11,7 +11,9 @@ class VBO {
         /** @type Vertex[] */
         this.verts = [];
 
-        /** @type HTMLButtonElement */
+        /** @type {HTMLElement} */
+        this.rootElement = null;
+        /** @type {HTMLButtonElement} */
         this.addButton = null;
     }
 
@@ -20,22 +22,39 @@ class VBO {
      * @returns {HTMLElement} DOM Element representing the VBO
      */
     buildDOM() {
-        let e = document.createElement('div');
-        e.classList.add("vbo");
+        // Delete the element if it already exists
+        if(this.rootElement != null){
+            this.rootElement.parentElement.removeChild(this.rootElement);
+        }
+        
+        this.rootElement = document.createElement('div');
+        this.rootElement.classList.add("vbo");
         
         let title = document.createElement("h2");
         title.innerText = this.name;
-        e.appendChild(title);
+        this.rootElement.appendChild(title);
 
         for(let v of this.verts){
-            e.appendChild(v.buildDOM());
+            this.rootElement.appendChild(v.buildDOM());
         }
 
         this.addButton = document.createElement('button');
         this.addButton.innerText = "Add Vertex";
-        e.appendChild(this.addButton);
+        this.addButton.onclick = () => {
+            this.addVertex(new Vertex(this));
+        }
+        this.rootElement.appendChild(this.addButton);
 
-        return e;
+        return this.rootElement;
+    }
+
+    /**
+     * Update the VBO's DOM in-place
+     */
+    updateDOM() {
+        if(this.rootElement != null){
+            this.rootElement.parentElement.appendChild(this.buildDOM());
+        }
     }
 
     /**
@@ -44,6 +63,7 @@ class VBO {
      */
     addVertex(v){
         this.verts.push(v);
+        this.updateDOM();
     }
 
     /**
@@ -74,6 +94,8 @@ class Vertex {
         /** @type {string} */
         this.color = parent.getNextColor();
 
+        /** @type {HTMLElement} */
+        this.rootElement
         /** @type {HTMLInputElement} */
         this.xInput = null;
         /** @type {HTMLInputElement} */
@@ -91,8 +113,13 @@ class Vertex {
      * @returns {HTMLElement} DOM Element representing the vertex
      */
     buildDOM(){
-        let e = document.createElement('div');
-        e.classList.add("vertex");
+        // Delete the element if it already exists
+        if(this.rootElement != null){
+            this.rootElement.parentElement.removeChild(this.rootElement);
+        }
+
+        this.rootElement = document.createElement('div');
+        this.rootElement.classList.add("vertex");
         {
             let label = document.createElement('label');
             label.innerText = "X: "
@@ -101,7 +128,7 @@ class Vertex {
             this.xInput.size = "3";
             this.xInput.value = this.x;
             label.appendChild(this.xInput);
-            e.appendChild(label);
+            this.rootElement.appendChild(label);
         }
         {
             let label = document.createElement('label');
@@ -111,21 +138,21 @@ class Vertex {
             this.yInput.size = "3";
             this.yInput.value = this.y;
             label.appendChild(this.yInput);
-            e.appendChild(label);
+            this.rootElement.appendChild(label);
         }
         this.colorPicker = document.createElement('input');
         this.colorPicker.type = "color";
         this.colorPicker.value = this.color;
-        e.appendChild(this.colorPicker);
+        this.rootElement.appendChild(this.colorPicker);
 
         this.upButton = document.createElement("button");
         this.upButton.innerText = "🠝"
-        e.appendChild(this.upButton);
+        this.rootElement.appendChild(this.upButton);
         this.downButton = document.createElement("button");
         this.downButton.innerText = "🠟"
-        e.appendChild(this.downButton);
+        this.rootElement.appendChild(this.downButton);
 
-        return e;
+        return this.rootElement;
     }
 }
 

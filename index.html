@@ -11,47 +11,10 @@
 <body>
     <h1>GLDraw</h1>
     <section id="inputs">
-        <div class="vbo">
-            <h2>VBO 0</h2>
-            <div class="vertex">
-                <label>X: <input type="number" size="3"/></label>
-                <label>Y: <input type="number" size="3"/></label>
-                <input type="color">
-                <button>&#129053;</button>
-                <button>&#129055;</button>
-            </div>
-            <div class="vertex">
-                <label>X: <input type="number" size="3"/></label>
-                <label>Y: <input type="number" size="3"/></label>
-                <input type="color">
-                <button>&#129053;</button>
-                <button>&#129055;</button>
-            </div>
-            <button>Add Vertex</button>
-        </div>
-        <div class="vbo">
-            <h2>VBO 1</h2>
-            <div class="vertex">
-                <label>X: <input type="number" size="3"/></label>
-                <label>Y: <input type="number" size="3"/></label>
-                <input type="color">
-                <button>&#129053;</button>
-                <button>&#129055;</button>
-            </div>
-            <div class="vertex">
-                <label>X: <input type="number" size="3"/></label>
-                <label>Y: <input type="number" size="3"/></label>
-                <input type="color">
-                <button>&#129053;</button>
-                <button>&#129055;</button>
-            </div>
-            <button>Add Vertex</button>
-        </div>
-        <br/>
-        <button>Add VBO</button>
     </section>
     <canvas id="display">
 
     </canvas>
+    <script>document.getElementById("inputs").appendChild(vbo.buildDOM());</script>
 </body>
 </html>
