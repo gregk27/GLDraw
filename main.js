@@ -1,5 +1,14 @@
 console.log("Hello World!")
 
+class DrawMode {
+    static POINTS = "Points";
+    static LINES = "Lines";
+    static LINE_STRIP = "Line Strip";
+    static LINE_LOOP = "Line Loop";
+
+    static modes = [this.POINTS, this.LINES, this.LINE_STRIP, this.LINE_LOOP]
+}
+
 class VBO {
     /**
      * Create a new VBO
@@ -8,6 +17,8 @@ class VBO {
     constructor(name) {
         /** @type string */
         this.name = name;
+        /** @type string */
+        this.drawMode = DrawMode.POINTS;
         /** @type Vertex[] */
         this.verts = [];
         /** @type number */
@@ -15,6 +26,8 @@ class VBO {
 
         /** @type {HTMLElement} */
         this.rootElement = null;
+        /** @type {HTMLInputElement} */
+        this.drawInput = null;
         /** @type {HTMLButtonElement} */
         this.addButton = null;
     }
@@ -35,6 +48,20 @@ class VBO {
         let title = document.createElement("h2");
         title.innerText = this.name;
         this.rootElement.appendChild(title);
+
+        this.drawInput = document.createElement("select");
+        for(let m of DrawMode.modes){
+            let opt = document.createElement("option");
+            opt.value = m;
+            opt.text = m;
+            if(m == this.drawMode) opt.selected = true;
+            this.drawInput.appendChild(opt);
+        }
+        this.drawInput.onchange = () => {
+            this.drawMode = this.drawInput.value;
+            redraw();
+        }
+        this.rootElement.appendChild(this.drawInput);
 
         for(let v of this.verts){
             this.rootElement.appendChild(v.buildDOM());
@@ -256,12 +283,75 @@ function redraw(){
 
     ctx.lineWidth = scale/2;
     for(let vbo of vbos){
+        switch(vbo.drawMode){
+            case DrawMode.POINTS:
+                drawPoints(vbo);
+                break;
+            case DrawMode.LINES:
+                drawLines(vbo);
+                break;
+            case DrawMode.LINE_STRIP:
+                drawLineStrip(vbo);
+                break;
+            case DrawMode.LINE_LOOP:
+                drawLineLoop(vbo);
+                break;
+        }
+    }
+
+    function transformPoint(x, y){
+        return [x*scale + cx, y*-scale + cy]
+    }
+
+    /**
+     * Draw VBO using GL_POINTS strategy
+     * @param {VBO} vbo 
+     */
+    function drawPoints(vbo){
+        for(let vert of vbo.verts){
+            ctx.fillStyle = vert.color;
+            ctx.fillRect(vert.x*scale + cx - ctx.lineWidth/2, vert.y*-scale + cy - ctx.lineWidth/2, ctx.lineWidth, ctx.lineWidth);
+        }
+    }
+    /**
+     * Draw VBO using GL_LINES strategy
+     * @param {VBO} vbo 
+     */
+    function drawLines(vbo) {
+        for(let i=0; i+1<vbo.verts.length; i+=2){
+            ctx.beginPath();
+            ctx.strokeStyle = vbo.verts[i].color;
+            ctx.moveTo(...transformPoint(vbo.verts[i].x, vbo.verts[i].y));
+            ctx.lineTo(...transformPoint(vbo.verts[i+1].x, vbo.verts[i+1].y));
+            ctx.stroke();
+        }
+    }
+    /**
+     * Draw VBO using GL_LINE_STRIP strategy
+     * @param {VBO} vbo 
+     */
+    function drawLineStrip(vbo) {
         ctx.beginPath();
-        ctx.moveTo(vbo.verts[0].x*scale + cx, vbo.verts[0].y*-scale + cy);
+        ctx.moveTo(...transformPoint(vbo.verts[0].x, vbo.verts[0].y));
         for(let vert of vbo.verts){
             ctx.strokeStyle = vert.color;
-            ctx.lineTo(vert.x*scale + cx, vert.y*-scale + cy);
+            ctx.lineTo(...transformPoint(vert.x, vert.y));
         }
+        ctx.stroke();
+    }
+    /**
+     * Draw VBO using GL_LINE_LOOP strategy
+     * @param {VBO} vbo 
+     */
+    function drawLineLoop(vbo) {
+        ctx.beginPath();
+        ctx.moveTo(...transformPoint(vbo.verts[0].x, vbo.verts[0].y));
+        for(let vert of vbo.verts){
+            ctx.strokeStyle = vert.color;
+            ctx.lineTo(...transformPoint(vert.x, vert.y));
+        }
+        ctx.strokeStyle = vbo.verts[0].color;
+        ctx.lineTo(...transformPoint(vbo.verts[0].x, vbo.verts[0].y));
         ctx.stroke();
     }
 }
