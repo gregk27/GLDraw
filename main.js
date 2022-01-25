@@ -2,11 +2,16 @@ console.log("Hello World!")
 
 class DrawMode {
     static POINTS = "Points";
+    
     static LINES = "Lines";
     static LINE_STRIP = "Line Strip";
     static LINE_LOOP = "Line Loop";
+    
+    static TRIANGLES = "Triangles";
+    static TRIANGLE_STRIP = "Triangle Strip";
+    static TRIANGLE_FAN = "Triangle Fan";
 
-    static modes = [this.POINTS, this.LINES, this.LINE_STRIP, this.LINE_LOOP]
+    static modes = [this.POINTS, this.LINES, this.LINE_STRIP, this.LINE_LOOP, this.TRIANGLES, this.TRIANGLE_STRIP, this.TRIANGLE_FAN]
 }
 
 class VBO {
@@ -296,6 +301,15 @@ function redraw(){
             case DrawMode.LINE_LOOP:
                 drawLineLoop(vbo);
                 break;
+            case DrawMode.TRIANGLES:
+                drawTriangles(vbo);
+                break;
+            case DrawMode.TRIANGLE_STRIP:
+                drawTriangleStrip(vbo);
+                break;
+            case DrawMode.TRIANGLE_FAN:
+                drawTriangleFan(vbo);
+                break;
         }
     }
 
@@ -353,6 +367,54 @@ function redraw(){
         ctx.strokeStyle = vbo.verts[0].color;
         ctx.lineTo(...transformPoint(vbo.verts[0].x, vbo.verts[0].y));
         ctx.stroke();
+    }
+    /**
+     * Draw VBO using GL_TRIANGLES strategy
+     * @param {VBO} vbo 
+     */
+    function drawTriangles(vbo) {
+        for(let i=0; i+2<vbo.verts.length; i+=3){
+            ctx.beginPath();
+            ctx.strokeStyle = vbo.verts[i].color;
+            ctx.fillStyle = vbo.verts[i].color;
+            ctx.moveTo(...transformPoint(vbo.verts[i].x, vbo.verts[i].y));
+            ctx.lineTo(...transformPoint(vbo.verts[i+1].x, vbo.verts[i+1].y));
+            ctx.lineTo(...transformPoint(vbo.verts[i+2].x, vbo.verts[i+2].y));
+            ctx.closePath();
+            ctx.fill()
+        }
+    }
+    /**
+     * Draw VBO using GL_TRIANGLE_STRIP strategy
+     * @param {VBO} vbo 
+     */
+    function drawTriangleStrip(vbo) {
+        for(let i=0; i+2<vbo.verts.length; i++){
+            ctx.beginPath();
+            ctx.strokeStyle = vbo.verts[i].color;
+            ctx.fillStyle = vbo.verts[i].color;
+            ctx.moveTo(...transformPoint(vbo.verts[i].x, vbo.verts[i].y));
+            ctx.lineTo(...transformPoint(vbo.verts[i+1].x, vbo.verts[i+1].y));
+            ctx.lineTo(...transformPoint(vbo.verts[i+2].x, vbo.verts[i+2].y));
+            ctx.closePath();
+            ctx.fill()
+        }
+    }
+    /**
+     * Draw VBO using GL_TRIANGLE_FAN strategy
+     * @param {VBO} vbo 
+     */
+    function drawTriangleFan(vbo) {
+        for(let i=0; i+1<vbo.verts.length; i++){
+            ctx.beginPath();
+            ctx.strokeStyle = vbo.verts[i].color;
+            ctx.fillStyle = vbo.verts[i].color;
+            ctx.moveTo(...transformPoint(vbo.verts[0].x, vbo.verts[0].y));
+            ctx.lineTo(...transformPoint(vbo.verts[i].x, vbo.verts[i].y));
+            ctx.lineTo(...transformPoint(vbo.verts[i+1].x, vbo.verts[i+1].y));
+            ctx.closePath();
+            ctx.fill()
+        }
     }
 }
 
